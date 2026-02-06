@@ -1,0 +1,11 @@
+spring:
+  profiles:
+    active: ${env:local}
+
+server:
+  port: 17010
+  shutdown: graceful
+
+logging:
+  level:
+    root: INFO

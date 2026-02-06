@@ -1,0 +1,25 @@
+spring:
+  config:
+    activate:
+      on-profile: local
+
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  sql:
+    init:
+      mode: always
+      #schema-locations: classpath:mapper/h2/sql/h2-schema.sql
+      #data-locations: classpath:mapper/h2/sql/h2-data.sql
+
+file:
+  upload:
+    path: ./upload

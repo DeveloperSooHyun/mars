@@ -1,0 +1,19 @@
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+  datasource:
+    url: jdbc:oracle:thin:@218.234.104.184:1521/ORCL
+    driver-class-name: oracle.jdbc.OracleDriver
+    username: DEV
+    password: "1234"
+
+  data:
+    redis:
+      host: 218.234.104.184
+      port: 6379
+
+file:
+  upload:
+    path: /prod/upload
