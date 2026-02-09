@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: ${env:local}
+    active: ${ENV:local}
 
 server:
   port: 17010
@@ -9,3 +9,9 @@ server:
 logging:
   level:
     root: INFO
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus

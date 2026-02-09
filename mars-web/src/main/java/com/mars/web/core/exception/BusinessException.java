@@ -8,7 +8,7 @@ import com.mars.web.core.response.ApiResponseCode;
  * 업무 로직에서 발생하는 예외 처리.
  *
  * History
- * - 2026.02.06 : 업무 로직 커스텀 예외 작성.
+ * - 2026.02.06 : 최초 생성.
  *
  * @author Mars
  * @since 2026.02.06
