@@ -1,20 +1,23 @@
 package com.mars.web.auth.jwt;
 
+import java.io.IOException;
+
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.filter.OncePerRequestFilter;
+
+import com.mars.web.core.config.redis.RedisBlacklistService;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.filter.OncePerRequestFilter;
 
-import java.io.IOException;
 
 /**
  * JwtAuthenticationFilter.java
  *
- * 토큰 추출 및 인증 객체 설정.
+ * 토큰 추출 및 인증 판단.
  *
  * History
  * - 2026.02.09 : 최초 생성.
@@ -22,38 +25,44 @@ import java.io.IOException;
  * @author Mars
  * @since 2026.02.09
  */
-
-@RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
+    private final RedisBlacklistService redisBlacklistService;
+
+    public JwtAuthenticationFilter(
+            JwtTokenProvider jwtTokenProvider,
+            RedisBlacklistService redisBlacklistService) {
+        this.jwtTokenProvider = jwtTokenProvider;
+        this.redisBlacklistService = redisBlacklistService;
+    }
 
     /**
-     * 필터 설정 (프로세스 실행마다 실행)
+     * 토큰 검증, 블랙리스트 판단.
      *
-     * @param  request,response,filterChain
+     * @param  
      * @return 
      */
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
-                                    FilterChain filterChain) throws ServletException, IOException {
+                                    FilterChain chain)
+            throws IOException, ServletException {
 
-        String bearerToken = request.getHeader(HttpHeaders.AUTHORIZATION);
+    	// 토큰 추출
+        String token = jwtTokenProvider.resolveToken(request);
 
-        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
-            String token = bearerToken.substring(7);
+        if (token != null && jwtTokenProvider.validateToken(token)) {
 
-            try {
-                if (jwtTokenProvider.validateToken(token)) {
-                    var authentication = jwtTokenProvider.getAuthentication(token);
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
-                }
-            } catch (Exception ignored) {
-                SecurityContextHolder.clearContext();
+            if (redisBlacklistService.isBlacklisted(token)) {
+                throw new BadCredentialsException("Revoked token");
             }
+
+            // 사용자 허용
+            SecurityContextHolder.getContext().setAuthentication(jwtTokenProvider.getAuthentication(token));
         }
 
-        filterChain.doFilter(request, response);
+        chain.doFilter(request, response);
     }
+
 }

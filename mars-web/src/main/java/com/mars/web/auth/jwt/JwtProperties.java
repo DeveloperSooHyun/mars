@@ -1,4 +1,4 @@
-package com.mars.web.core.config.properties;
+package com.mars.web.auth.jwt;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
@@ -22,18 +22,12 @@ import lombok.Setter;
 @ConfigurationProperties(prefix = "jwt")
 public class JwtProperties {
 
-    /**
-     * JWT 서명에 사용되는 시크릿 키
-     */
+	// JWT 서명에 사용되는 시크릿 키
     private String secret;
 
-    /**
-     * Access Token 만료 시간 (ms)
-     */
+    // Access Token 만료 시간 (ms)
     private long accessExpiration;
 
-    /**
-     * Refresh Token 만료 시간 (ms)
-     */
+    // Refresh Token 만료 시간 (ms)
     private long refreshExpiration;
 }

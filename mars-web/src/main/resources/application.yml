@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: ${ENV:local}
+    active: dev
 
 server:
   port: 17010
@@ -15,3 +15,11 @@ management:
     web:
       exposure:
         include: health,info,prometheus
+
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+    jdbc-type-for-null: VARCHAR
+    default-statement-timeout: 25000
+  mapper-locations: classpath*:mapper/mybatis/**/*.xml
+  type-aliases-package: com.example.project.domain

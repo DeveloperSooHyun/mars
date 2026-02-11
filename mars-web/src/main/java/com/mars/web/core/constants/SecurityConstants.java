@@ -1,5 +1,7 @@
 package com.mars.web.core.constants;
 
+import java.util.List;
+
 /**
  * SecurityConstants
  *
@@ -17,7 +19,9 @@ public class SecurityConstants {
             "/", "/index.html", "/css/**", "/js/**", "/images/**"
     };
 
-    public static final int ACCESS_TOKEN_EXPIRED = 30 * 60;
-    public static final int REFRESH_TOKEN_EXPIRED = 7 * 24 * 60 * 60;
+    // API 호출이지만 Access Token 없을 때도 허용할 URL
+    public static final List<String> NONE_FILTER_CHECK_URL = List.of(
+        "/auth/login"
+    );
 }
 

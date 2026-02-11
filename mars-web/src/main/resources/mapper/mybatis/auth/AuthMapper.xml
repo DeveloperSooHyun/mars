@@ -1,11 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.mars.web.auth.mapper.AuthMapper">
-	<select id="selectUserById" resultType="map">
+	<select id="selectUserById" resultType="java.util.HashMap">
+	    /* [AuthMapper][selectUserById] 사용자 정보 조회(로그인) */
 	    SELECT
 	        USER_ID,
 	        USER_PW,
 	        USER_TYPE_CD
-	    FROM TB_USER
+	    FROM EM_USER
 	    WHERE USER_ID = #{userId}
 	</select>
+	
+	<select id="selectUserByToken" resultType="java.util.HashMap">
+	    /* [AuthMapper][selectUserByToken] 사용자 정보 조회(로그인) */
+	    SELECT
+	        USER_ID,
+	        USER_PW,
+	        USER_TYPE_CD
+	    FROM EM_USER
+	    WHERE REFRESH_TOKEN = #{refreshToken}
+	</select>
+	
 </mapper>

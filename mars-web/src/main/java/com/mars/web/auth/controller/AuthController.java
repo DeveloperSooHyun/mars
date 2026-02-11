@@ -9,9 +9,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.mars.web.auth.dto.LoginRequest;
 import com.mars.web.auth.dto.LoginResponse;
+import com.mars.web.auth.dto.TokenRefreshResponse;
 import com.mars.web.auth.service.AuthService;
 import com.mars.web.core.response.ApiResponse;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
@@ -36,6 +38,9 @@ public class AuthController {
     
     /**
      * 로그인
+     *
+     * @param  request, response
+     * @return response
      */
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<LoginResponse>> login(@RequestBody LoginRequest request, HttpServletResponse response) {
@@ -43,18 +48,25 @@ public class AuthController {
     }
 
     /**
-     * 토큰 재발급
+     * 토큰 갱신
+     *
+     * @param  refreshToken(HttpOnly Cookie 자동 추출)
+     * @return response
      */
     @PostMapping("/refresh")
-    public ResponseEntity<ApiResponse<String>> refresh(@CookieValue("refreshToken") String refreshToken) {
+    public ResponseEntity<ApiResponse<TokenRefreshResponse>> refresh(@CookieValue("refreshToken") String refreshToken) {
     	return authService.refresh(refreshToken);
     }
 
     /**
      * 로그아웃
+     *
+     * @param  response
+     * @return response
      */
     @PostMapping("/logout")
-    public ResponseEntity<ApiResponse<String>> logout(HttpServletResponse response) {
-    	return authService.logout(response);
+    public ResponseEntity<ApiResponse<String>> logout(HttpServletRequest request, HttpServletResponse response) {
+        return authService.logout(request, response);
     }
+
 }

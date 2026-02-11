@@ -3,6 +3,9 @@ package com.mars.web.auth.mapper;
 import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import com.mars.web.auth.dto.LoginRequest;
 
 /**
  * AuthMapper.java
@@ -17,5 +20,7 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface AuthMapper {
-	Map<String, Object> selectUserById(String userId);
+	// 사용자 정보 조회
+	Map<String, Object> selectUserById(LoginRequest request);
+	Map<String, Object> selectUserByToken(@Param("refreshToken") String refreshToken);
 }

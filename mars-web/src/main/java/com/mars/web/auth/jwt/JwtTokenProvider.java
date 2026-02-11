@@ -1,9 +1,13 @@
 package com.mars.web.auth.jwt;
 
-import com.mars.web.core.config.properties.JwtProperties;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -81,11 +85,39 @@ public class JwtTokenProvider {
      * @return Boolean
      */
     public boolean validateToken(String token) {
-        Jwts.parser()
-                .verifyWith(getKey())
-                .build()
-                .parseSignedClaims(token);
-        return true;
+    	try {
+            getClaims(token);
+            return true;
+        } catch (JwtException e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+    
+    
+    /**
+     * 토큰 예외처리
+     *
+     * @param  token
+     * @return Boolean
+     */
+    private Claims getClaims(String jwt) {
+    	try {
+    	    Claims claims = Jwts.parser()
+    	                        .verifyWith(getKey())
+    	                        .build()
+    	                        .parseSignedClaims(jwt)
+    	                        .getPayload();
+    	    return claims;
+    	} catch (ExpiredJwtException e) {
+            throw new JwtException("[ExpiredJwtException] 토큰이 만료되었습니다.");
+        } catch (MalformedJwtException e) {
+            throw new JwtException("[MalformedJwtException] 잘못된 토큰입니다.");
+        } catch (UnsupportedJwtException e) {
+            throw new JwtException("[UnsupportedJwtException] 잘못된 형식의 토큰입니다.");
+        } catch (IllegalArgumentException e) {
+            throw new JwtException("[IllegalArgumentException] 잘못된 토큰입니다.");
+        }
     }
 
     /**
@@ -118,11 +150,71 @@ public class JwtTokenProvider {
      * @return String
      */
     public String getUserId(String token) {
-        return Jwts.parser()
+        Claims claims = Jwts.parser()
                 .verifyWith(getKey())
                 .build()
                 .parseSignedClaims(token)
-                .getPayload()
-                .getSubject();
+                .getPayload();
+
+        return claims.getSubject();
+    }
+
+    
+    /**
+     * 사용자 Role 조회
+     *
+     * @param  token
+     * @return String
+     */
+    public String getRole(String token) {
+        try {
+            Claims claims = Jwts.parser()
+                    .verifyWith(getKey())
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
+
+            return claims.get("role", String.class);
+        } catch (JwtException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    
+    
+    /**
+     * 만료까지 남은 시간 조회
+     *
+     * @param  token
+     * @return String
+     */
+    public long getExpiration(String token) {
+    	try {
+    		Claims claims = Jwts.parser()
+                    .verifyWith(getKey())
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
+        	Date expiration = claims.getExpiration();
+        	return expiration.getTime() - System.currentTimeMillis();
+    	} catch (JwtException e) {
+    		return 0L;
+    	}
+    }
+    
+    
+    /**
+     * HTTP 요청에서 Authorization 헤더에서 토큰 추출
+     *
+     * @param  token
+     * @return String
+     */
+    public String resolveToken(HttpServletRequest request) {
+        String bearer = request.getHeader("Authorization");
+        if (bearer != null && bearer.startsWith("Bearer ")) {
+            return bearer.substring(7);
+        }
+        return null;
     }
 }

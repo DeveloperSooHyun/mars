@@ -3,7 +3,7 @@ package com.mars.web.core.config;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
-import com.mars.web.core.config.properties.JwtProperties;
+import com.mars.web.auth.jwt.JwtProperties;
 
 /**
  * PropertiesConfig.java
