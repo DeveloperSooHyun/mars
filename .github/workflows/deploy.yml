@@ -24,8 +24,9 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SERVER_PORT }}
-          source: "build/libs/*.jar,Dockerfile"
+          source: "mars-web/build/libs/*.jar,mars-web/Dockerfile"
           target: "/home/${{ secrets.SERVER_USER }}/app"
+          strip_components: 2
 
       - name: Deploy Docker
         uses: appleboy/ssh-action@v1.0.3
