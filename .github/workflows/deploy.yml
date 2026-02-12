@@ -1,4 +1,4 @@
-name: Deploy Spring to WSL Ubuntu
+name: Build Spring Project
 
 on:
   push:
@@ -9,35 +9,47 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 코드 체크아웃
       - uses: actions/checkout@v4
 
+      # JDK 17 설치 
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      
+      # Gradle Build
       - name: Build with Gradle
         working-directory: mars-web
         run: |
           chmod +x gradlew
           ./gradlew clean build -x test
 
-      - name: Copy files to WSL
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SSH_KEY }}
-          port: ${{ secrets.SERVER_PORT }}
-          source: "mars-web/build/libs/*.jar,mars-web/Dockerfile"
-          target: "/home/${{ secrets.SERVER_USER }}/app"
-          strip_components: 2
+      # ------------------------------
+      # 아래 단계는 로컬 WSL 배포로 대체됨
+      # ------------------------------
+      #- name: Copy files to WSL
+      #  uses: appleboy/scp-action@v0.1.7
+      #  with:
+      #    host: ${{ secrets.SERVER_HOST }}
+      #    username: ${{ secrets.SERVER_USER }}
+      #    key: ${{ secrets.SSH_KEY }}
+      #    port: ${{ secrets.SERVER_PORT }}
+      #    source: "mars-web/build/libs/*.jar,mars-web/Dockerfile"
+      #    target: "/home/${{ secrets.SERVER_USER }}/app"
+      #    strip_components: 2
 
-      - name: Deploy Docker
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SSH_KEY }}
-          port: ${{ secrets.SERVER_PORT }}
-          script: |
-            cd ~/app
-            docker stop spring-app || true
-            docker rm spring-app || true
-            docker build -t spring-app .
-            docker run -d --name spring-app -p 8080:8080 spring-app
+      #- name: Deploy Docker
+      #  uses: appleboy/ssh-action@v1.0.3
+      #  with:
+      #    host: ${{ secrets.SERVER_HOST }}
+      #    username: ${{ secrets.SERVER_USER }}
+      #    key: ${{ secrets.SSH_KEY }}
+      #    port: ${{ secrets.SERVER_PORT }}
+      #    script: |
+      #      cd ~/app
+      #      docker stop spring-app || true
+      #      docker rm spring-app || true
+      #      docker build -t spring-app .
+      #      docker run -d --name spring-app -p 8080:8080 spring-app
