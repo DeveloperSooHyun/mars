@@ -4,18 +4,19 @@ spring:
       on-profile: dev
 
   datasource:
-    url: ${DB_URL}
+    url: jdbc:oracle:thin:@//192.168.0.119:1521/ORCLPDB
     driver-class-name: oracle.jdbc.OracleDriver
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    username: devuser
+    password: dev1234
 
   data:
     redis:
-      host: ${REDIS_HOST}
-      port: ${REDIS_PORT}
+      enabled: false
+      host: localhost
+      port: 6379
 
 jwt:
-  secret: ${JWT_SECRET}
+  secret: YQ6hz544Fcd0a1AqPDJ8YGnFVONempMY1rhfMuSG910=
   access-expiration: 7200000        # 2시간
   refresh-expiration: 2592000000    # 30일
 
