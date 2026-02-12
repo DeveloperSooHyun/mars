@@ -1,4 +1,4 @@
-name: Build Spring Project
+name: Deploy Spring to WSL Ubuntu
 
 on:
   push:
@@ -12,13 +12,6 @@ jobs:
       # 코드 체크아웃
       - uses: actions/checkout@v4
 
-      # JDK 17 설치 
-      - name: Set up JDK
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'
-          java-version: '17'
-      
       # Gradle Build
       - name: Build with Gradle
         working-directory: mars-web
@@ -26,6 +19,30 @@ jobs:
           chmod +x gradlew
           ./gradlew clean build -x test
 
+     # 3️⃣ WSL에 파일 전송
+      - name: Copy files to WSL
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SERVER_PORT }}
+          source: "mars-web/build/libs/*.jar,mars-web/Dockerfile,mars-web/deploy.sh"
+          target: "/home/${{ secrets.SERVER_USER }}/app"
+          strip_components: 1
+
+      # 4️⃣ WSL에서 deploy.sh 실행
+      - name: Run deploy.sh on WSL
+        uses: appleboy/ssh-action@v0.1.6
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SERVER_PORT }}
+          script: |
+            cd /home/${{ secrets.SERVER_USER }}/app
+            chmod +x deploy.sh
+            ./deploy.sh
       # ------------------------------
       # 아래 단계는 로컬 WSL 배포로 대체됨
       # ------------------------------
