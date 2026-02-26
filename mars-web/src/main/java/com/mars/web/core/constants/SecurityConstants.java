@@ -21,7 +21,7 @@ public class SecurityConstants {
 
     // API 호출이지만 Access Token 없을 때도 허용할 URL
     public static final List<String> NONE_FILTER_CHECK_URL = List.of(
-        "/auth/login"
+        "/auth/login","/auth/logout"
     );
 }
 

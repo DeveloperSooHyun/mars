@@ -28,7 +28,7 @@
 			FROM 	EM_MENU A 
 			INNER JOIN EM_MENU_ROLE B 
 			ON A.MENU_ID = B.MENU_ID 
-			WHERE B.USER_TYPE_CD = #{userTypeCd}
+			WHERE B.USER_TYPE_CD = #{g_userTypeCd}
 			AND A.USE_YN = 'Y'
 			AND B.USE_YN = 'Y'
 		) C 

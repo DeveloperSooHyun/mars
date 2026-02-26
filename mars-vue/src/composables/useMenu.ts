@@ -14,6 +14,42 @@ const loading = ref(false)
 const loaded = ref(false)
 const error = ref(false)
 
+// ✅ 추가 - flat 배열 → tree 구조 변환
+function buildTree(flatList: any[]): MenuItem[] {
+  const map = new Map<string, MenuItem>()
+  const roots: MenuItem[] = []
+
+  flatList.forEach(item => {
+    map.set(
+        item.MENU_ID, 
+        {
+            id:    item.MENU_NO,
+            label: item.MENU_NAME,
+            path:  item.MENU_URL ?? undefined,
+            icon:  item.MENU_ICON ?? undefined,
+            children: []
+        }
+    )
+  })
+
+  flatList.forEach(item => {
+    const current = map.get(item.MENU_ID)!
+    if (item.MENU_LEVEL === 1) {
+      roots.push(current)
+    } else {
+      const parentId = item.MENU_ID.slice(0, -2)
+      const parent = map.get(parentId)
+      if (parent) parent.children!.push(current)
+    }
+  })
+
+  map.forEach(item => {
+    if (item.children?.length === 0) delete item.children
+  })
+
+  return roots
+}
+
 export function useMenu() {
 
   async function loadMenus() {
@@ -24,18 +60,17 @@ export function useMenu() {
     
     try {
         const res = await api.getMenus()
-        menus.value = res.data
+        menus.value = buildTree(res.data.data)
     } catch (e) {
         error.value = true
     } finally {
-        loaded.value = true   // 성공/실패 무관하게 시도했음을 기록
+        loaded.value = true
         loading.value = false
     }
   }
 
   async function retryMenus() {
-    if (loading.value) return   // ✅ 이미 호출 중이면 무시
-    
+    if (loading.value) return
     loaded.value = false
     await loadMenus()
   }

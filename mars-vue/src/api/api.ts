@@ -15,9 +15,9 @@ export const api = {
 
   // 사용자 정보
   getUserInfo: () =>
-    instance.get('/api/user/userInfo', {}),
+    instance.post('/api/user/userInfo', {}),
 
   // 메뉴
   getMenus: () =>
-    instance.get('/api/menu', {}),
+    instance.post('/api/menu/menuList', {}),
 };

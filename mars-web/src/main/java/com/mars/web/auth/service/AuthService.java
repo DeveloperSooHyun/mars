@@ -1,6 +1,5 @@
 package com.mars.web.auth.service;
 
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -16,7 +15,6 @@ import com.mars.web.auth.dto.TokenRefreshResponse;
 import com.mars.web.auth.jwt.JwtProperties;
 import com.mars.web.auth.jwt.JwtTokenProvider;
 import com.mars.web.auth.mapper.AuthMapper;
-import com.mars.web.business.em.mapper.MenuMapper;
 import com.mars.web.core.config.redis.RedisBlacklistService;
 import com.mars.web.core.exception.BusinessException;
 import com.mars.web.core.response.ApiResponse;
@@ -47,7 +45,6 @@ public class AuthService {
     private final JwtTokenProvider jwtTokenProvider;
     private final JwtProperties jwtProperties;
     private final AuthMapper authMapper;
-    private final MenuMapper menuMapper;
     private final PasswordEncoder passwordEncoder;
     private final StringRedisTemplate redisTemplate;
     private final RedisBlacklistService redisBlacklistService;
@@ -66,6 +63,9 @@ public class AuthService {
 		}
 		
 		String dbPw = CommonUtil.StringEx.nvl(user.get("USER_PW"));
+		
+		//BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+		//String encoded = encoder.encode("1234");
 		
 		if (!passwordEncoder.matches(request.getUserPw(), dbPw)) {
 			throw new BusinessException(ApiResponseCode.PASSWORD_NOT_MATCH);
@@ -94,14 +94,9 @@ public class AuthService {
 		ResponseCookie refreshCookie = CommonUtil.SecurityEx.refreshCookie(refreshToken, jwtProperties.getRefreshExpiration() / 1000);
 		response.addHeader("Set-Cookie", refreshCookie.toString());
 		
-		
-		// 사용자 별 메뉴 리스트 조회
-		List<Map<String,Object>> menuList = menuMapper.selectMenuList(user);
-		
 		// Response DTO
 		LoginResponse loginResponse = LoginResponse.builder()
 		.userId(userId)
-		.menus(menuList)
 		.userTypeCd(userTypeCd)
 		.accessToken(accessToken)
 		.build();
