@@ -112,7 +112,7 @@ function handleClick() {
           :collapsed="collapsed"
           :open-map="openMap"
           :active-path="activePath"
-          @toggle="emit('toggle', ...arguments)"
+          @toggle="(id: number, depth: number) => emit('toggle', id, depth)"
         />
       </div>
     </transition>

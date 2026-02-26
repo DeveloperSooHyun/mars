@@ -5,7 +5,6 @@ import LoginLayout from '@/layouts/auth/LoginLayout.vue'
 import Login from '@/views/auth/Login.vue'
 import MainLayout from '@/layouts/main/MainLayout.vue'
 import { useAuth } from '@/composables/useAuth'
-import type { ComponentPublicInstance } from 'vue'
 
 const { isAuthenticated } = useAuth()
 

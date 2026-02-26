@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, reactive, defineExpose } from 'vue'
+import { reactive } from 'vue'
 
 export type MessageSeverity = 'info' | 'success' | 'warn' | 'error'
 
