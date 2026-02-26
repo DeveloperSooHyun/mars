@@ -1,12 +1,12 @@
 <template>
   <div>
-    <h1>Dashboard</h1>
-    <p>환영합니다.</p>
+    <h1>Register</h1>
+    <p>회원가입</p>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'Dashboard'
+  name: 'Register'
 }
 </script>

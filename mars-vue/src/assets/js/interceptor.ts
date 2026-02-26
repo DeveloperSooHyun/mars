@@ -10,6 +10,14 @@ const instance = axios.create({
   headers: { 'Content-Type': 'application/json; charset=UTF-8' }
 });
 
+// refresh 전용 인터셉터 없는 순수 instance
+const refreshInstance = axios.create({
+  timeout: 10000,
+  withCredentials: true,
+  headers: { 'Content-Type': 'application/json; charset=UTF-8' }
+});
+
+
 // =========================
 // 토큰 관리
 // =========================
@@ -33,7 +41,7 @@ export function isAccessTokenExpired(token?: string) {
 instance.interceptors.request.use(
   (config) => {
     const token = getAccessToken();
-    if (token) config.headers.Authorization = `Bearer ${token}`;
+    if (token && token !== 'null' && token !== 'undefined') config.headers.Authorization = `Bearer ${token}`;
     return config;
   },
   (error) => Promise.reject(error)
@@ -47,29 +55,32 @@ instance.interceptors.response.use(
   async (error: AxiosError & { config: any }) => {
     const originalRequest = error.config;
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    if (
+      error.response?.status === 401 &&
+      !originalRequest._retry &&
+      !originalRequest.url?.includes('/auth/refresh')
+    ) {
       originalRequest._retry = true;
 
       try {
-        // 백엔드 토큰 갱신 API
-        const res = await axios.post('/api/auth/refresh', {});
+        const res = await refreshInstance.post('/api/auth/refresh', {})
         const newAccessToken = res.data.accessToken;
-        
+
         setAccessToken(newAccessToken);
-        
+
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
 
-        return axios(originalRequest);
+        return instance(originalRequest)
       } catch (refreshError) {
         removeAccessToken();
-
         window.location.href = '/login?reason=expired';
-        
         return Promise.reject(refreshError);
       }
     }
+
     return Promise.reject(error);
   }
 );
+
 
 export default instance;

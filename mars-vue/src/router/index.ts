@@ -4,6 +4,8 @@ import { useAuth } from '@/composables/useAuth'
 import LoginLayout from '@/layouts/auth/LoginLayout.vue'
 import MainLayout from '@/layouts/main/MainLayout.vue'
 import Login from '@/views/auth/Login.vue'
+import Register from '@/views/auth/Register.vue'
+import FindUserInfo from '@/views/auth/FindUserInfo.vue'
 import Dashboard from '@/views/common/Dashboard.vue'
 import NotFound from '@/views/common/NotFound.vue'
 
@@ -12,11 +14,9 @@ const routes = [
     path: '/login',
     component: LoginLayout,
     children: [
-      {
-        path: '',
-        name: 'Login',
-        component: Login
-      }
+          { path: '', name: 'Login', component: Login },
+          { path: 'register', name: 'Register', component: Register },
+          { path: 'findUserInfo', name: 'FindUserInfo', component: FindUserInfo },
     ]
   },
   {
@@ -45,13 +45,13 @@ const router = createRouter({
 
 router.beforeEach((to, _from, next) => {
   const { isAuthenticated } = useAuth()
-
+  
   if (to.meta.requiresAuth && !isAuthenticated.value) {
     next('/login')
-  } 
-  else if (to.path === '/login' && isAuthenticated.value) {
+  }
+  else if (to.path.startsWith('/login') && isAuthenticated.value) {
     next('/')
-  } 
+  }
   else {
     next()
   }
