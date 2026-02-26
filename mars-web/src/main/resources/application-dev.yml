@@ -4,10 +4,10 @@ spring:
       on-profile: dev
 
   datasource:
-    url: jdbc:oracle:thin:@//192.168.0.119:1521/ORCLPDB
+    url: jdbc:oracle:thin:@//
     driver-class-name: oracle.jdbc.OracleDriver
-    username: devuser
-    password: dev1234
+    username: 
+    password: 
 
   data:
     redis:
