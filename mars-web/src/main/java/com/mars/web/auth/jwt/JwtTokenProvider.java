@@ -44,16 +44,16 @@ public class JwtTokenProvider {
     /**
      * Access Token 생성
      *
-     * @param  userId , role
+     * @param  userId , userTypeCd
      * @return String
      */
-    public String createAccessToken(String userId, String role) {
+    public String createAccessToken(String userId, String userTypeCd) {
         Date now = new Date();
         Date expiration = new Date(now.getTime() + jwtProperties.getAccessExpiration());
 
         return Jwts.builder()
                 .subject(userId)
-                .claim("role", role)
+                .claim("userTypeCd", userTypeCd)
                 .issuedAt(now)
                 .expiration(expiration)
                 .signWith(getKey())
@@ -134,10 +134,10 @@ public class JwtTokenProvider {
                 .getPayload();
 
         String userId = claims.getSubject();
-        String role = claims.get("role", String.class);
+        String userTypeCd = claims.get("userTypeCd", String.class);
 
         User principal = new User(userId, "",
-                List.of(new SimpleGrantedAuthority(role)));
+                List.of(new SimpleGrantedAuthority(userTypeCd)));
 
         return new UsernamePasswordAuthenticationToken(
                 principal, "", principal.getAuthorities());
@@ -161,7 +161,7 @@ public class JwtTokenProvider {
 
     
     /**
-     * 사용자 Role 조회
+     * 사용자 userTypeCd 조회
      *
      * @param  token
      * @return String
@@ -174,7 +174,7 @@ public class JwtTokenProvider {
                     .parseSignedClaims(token)
                     .getPayload();
 
-            return claims.get("role", String.class);
+            return claims.get("userTypeCd", String.class);
         } catch (JwtException e) {
             e.printStackTrace();
             return null;

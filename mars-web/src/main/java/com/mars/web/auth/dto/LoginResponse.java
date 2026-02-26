@@ -1,5 +1,8 @@
 package com.mars.web.auth.dto;
 
+import java.util.List;
+import java.util.Map;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -21,7 +24,10 @@ import lombok.Getter;
 public class LoginResponse {
 
     private String userId;
+    private String userTypeCd;
+    
     private String accessToken;
-    private String refreshToken;
+    
+    private List<Map<String,Object>> menus;
 
 }

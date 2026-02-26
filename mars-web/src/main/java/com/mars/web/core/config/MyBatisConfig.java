@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.mars.web.core.interceptor.SqlExecutionInterceptor;
+import org.apache.ibatis.annotations.Mapper;
 
 /**
  * MyBatisConfig.java
@@ -21,7 +22,10 @@ import com.mars.web.core.interceptor.SqlExecutionInterceptor;
  * @since 2026.02.11
  */
 @Configuration
-@MapperScan("com.mars.web.auth.mapper")
+@MapperScan(
+  basePackages = "com.mars.web",
+  annotationClass = Mapper.class
+)
 public class MyBatisConfig {
 	
 	private final SqlExecutionInterceptor sqlExecutionInterceptor;
@@ -39,7 +43,7 @@ public class MyBatisConfig {
     }
 
     /**
-     * HMap alias 등록 (선택)
+     * HMap alias 등록
      */
     @Bean
     org.apache.ibatis.session.Configuration myBatisConfiguration() {
